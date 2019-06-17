@@ -92,37 +92,37 @@ data:
       # Reload module configs as they change:
       reload.enabled: false
 
-    # To enable hints based autodiscover uncomment this (and comment out the section following, which uses regex matching autodiscover):
-    #metricbeat.autodiscover:
-    #  providers:
-    #    - type: kubernetes
-    #      host: ${NODE_NAME}
-    #      hints.enabled: true
-
+    #To enable hints based autodiscover uncomment this (and comment out the section following, which uses regex matching autodiscover):
     metricbeat.autodiscover:
-      providers:
-        - type: kubernetes
-          host: ${HOSTNAME}
-          templates:
-            - condition.equals:
-                kubernetes.labels.tier: backend
-              config:
-                - module: redis
-                  metricsets: ["info", "keyspace"]
-                  period: 10s
+     providers:
+       - type: kubernetes
+         host: ${NODE_NAME}
+         hints.enabled: true
 
-                  # Redis hosts
-                  hosts: ["${data.host}:6379"]
+    # metricbeat.autodiscover:
+    #   providers:
+    #     - type: kubernetes
+    #       host: ${HOSTNAME}
+    #       templates:
+    #         - condition.equals:
+    #             kubernetes.labels.tier: backend
+    #           config:
+    #             - module: redis
+    #               metricsets: ["info", "keyspace"]
+    #               period: 10s
 
-            - condition.equals:
-                kubernetes.labels.tier: frontend
-              config:
-                - module: apache
-                  metricsets: ["status"]
-                  period: 10s
+    #               # Redis hosts
+    #               hosts: ["${data.host}:6379"]
 
-                  # Apache hosts
-                  hosts: ["http://${data.host}:80"]
+    #         - condition.equals:
+    #             kubernetes.labels.tier: frontend
+    #           config:
+    #             - module: apache
+    #               metricsets: ["status"]
+    #               period: 10s
+
+    #               # Apache hosts
+    #               hosts: ["http://${data.host}:80"]
 
 
     processors:
@@ -237,17 +237,15 @@ spec:
         - name: ELASTICSEARCH_USERNAME
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
-          value: changeme
+          valueFrom:
+            secretKeyRef:
+              name: dynamic-logging
+              key: ELASTIC_PASSWORD
         - name: ELASTIC_CLOUD_ID
           valueFrom:
             secretKeyRef:
               name: dynamic-logging
               key: CLOUD_ID
-        - name: ELASTIC_CLOUD_AUTH
-          valueFrom:
-            secretKeyRef:
-              name: dynamic-logging
-              key: ELASTIC_PASSWORD
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -380,17 +378,15 @@ spec:
         - name: ELASTICSEARCH_USERNAME
           value: elastic
         - name: ELASTICSEARCH_PASSWORD
-          value: changeme
+          valueFrom:
+            secretKeyRef:
+              name: dynamic-logging
+              key: ELASTIC_PASSWORD
         - name: ELASTIC_CLOUD_ID
           valueFrom:
             secretKeyRef:
               name: dynamic-logging
               key: CLOUD_ID
-        - name: ELASTIC_CLOUD_AUTH
-          valueFrom:
-            secretKeyRef:
-              name: dynamic-logging
-              key: ELASTIC_PASSWORD
         - name: NODE_NAME
           valueFrom:
             fieldRef:
