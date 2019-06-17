@@ -29,8 +29,9 @@ data:
     - type: mysql
       ports: [3306]
 
-    - type: redis
-      ports: [6379]
+    - type: mongodb
+      send_request: true
+      send_response: true
 
     packetbeat.flows:
       timeout: 30s
